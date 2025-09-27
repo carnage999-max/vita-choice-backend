@@ -1,27 +1,7 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 
 
-# --------------------
-# User / Customer
-# --------------------
-class User(AbstractUser):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(unique=True)
-    is_customer = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
-
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"]
-
-    def __str__(self):
-        return self.email
-
-
-# --------------------
-# Product Catalog
-# --------------------
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, db_index=True)
@@ -36,14 +16,7 @@ class Product(models.Model):
     review_count = models.IntegerField(default=0)
     description = models.TextField(blank=True)
     short_description = models.TextField(blank=True)
-    benefits = models.JSONField(default=list, blank=True)
-    key_actives = models.JSONField(default=list, blank=True)
-    free_from = models.JSONField(default=list, blank=True)
-    serving_size = models.CharField(max_length=100, blank=True)
-    servings_per_bottle = models.IntegerField(null=True, blank=True)
     usage = models.TextField(blank=True)
-    is_bestseller = models.BooleanField(default=False)
-    is_specialized = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -73,7 +46,7 @@ class FAQ(models.Model):
 # --------------------
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE)
+    user = models.ForeignKey("users.User", related_name="orders", on_delete=models.CASCADE)
     status = models.CharField(
         max_length=20,
         choices=[
