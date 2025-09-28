@@ -135,15 +135,15 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
-EMAIL_HOST_USER = "AKIA2IGFEJG5MOP2YY5O"
-EMAIL_HOST_PASSWORD = "BOtrp+8sVeLKV5y6xmBhSVjpWS55nO5IE4DEcQMwuMZS"
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 # DEFAULT_FROM_EMAIL = "ezekielokebule@proton.me"
-DEFAULT_FROM_EMAIL = "nathan@membershipauto.com"
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
-CONTACT_EMAIL_RECIPIENT = "ezekielokebule@proton.me"
+CONTACT_EMAIL_RECIPIENT = config('CONTACT_EMAIL_RECIPIENT')
 
 
 REST_FRAMEWORK = {
