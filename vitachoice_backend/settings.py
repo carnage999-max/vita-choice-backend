@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,19 +27,27 @@ SECRET_KEY = "django-insecure-y@1btw+_mm+vfappt!(6=x1y+=$3^*_*=czh)lfc)r0n1e786q
 DEBUG = True
 
 ALLOWED_HOSTS = []
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000'
+]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    
+    'rest_framework',
+    'rest_framework_simplejwt',
     'main',
-    'users'
+    'users',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -49,6 +58,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware"
 ]
 
 ROOT_URLCONF = "vitachoice_backend.urls"
@@ -115,6 +125,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATIC_URL = "static/"
 
@@ -122,3 +133,34 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = "AKIA2IGFEJG5MOP2YY5O"
+EMAIL_HOST_PASSWORD = "BOtrp+8sVeLKV5y6xmBhSVjpWS55nO5IE4DEcQMwuMZS"
+# DEFAULT_FROM_EMAIL = "ezekielokebule@proton.me"
+DEFAULT_FROM_EMAIL = "nathan@membershipauto.com"
+
+CONTACT_EMAIL_RECIPIENT = "ezekielokebule@proton.me"
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Vita Choice Admin",
+    "site_header": "Vita Choice",
+    "site_brand": "Vita Choice",
+    "welcome_sign": "Manage your products and wellness stack",
+    "copyright": "Vita Choice © 2025",
+    "show_ui_builder": True,
+    "navigation_expanded": True,
+    "icons": {
+        "Product": "fas fa-box",
+    },
+}
