@@ -26,8 +26,8 @@ SECRET_KEY = "django-insecure-y@1btw+_mm+vfappt!(6=x1y+=$3^*_*=czh)lfc)r0n1e786q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+ALLOWED_HOSTS = ["vita-choice-backend.onrender.com"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://vita-choice.vercel.app"]
 
 
 # Application definition
@@ -87,6 +87,18 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+
+# Redis Cache Configuration
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config("REDIS_URL", default="redis://127.0.0.1:6379/1"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "KEY_PREFIX": "vitachoice",  # Prefix for all cache keys
     }
 }
 

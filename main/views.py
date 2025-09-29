@@ -2,6 +2,9 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 from .models import ContactMessage
 from .models import Product
 from .serializers import ProductSerializer
@@ -20,6 +23,25 @@ class ProductViewset(ModelViewSet):
         else:
             permission_classes = []
         return [permission() for permission in permission_classes]
+
+    @method_decorator(cache_page(60 * 60 * 24))  # Cache for 24 hours
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        cache.delete_pattern("vitachoice:*")  # Clear cache when new product is added
+        return response
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        cache.delete_pattern("vitachoice:*")  # Clear cache when product is updated
+        return response
+
+    def destroy(self, request, *args, **kwargs):
+        response = super().destroy(request, *args, **kwargs)
+        cache.delete_pattern("vitachoice:*")  # Clear cache when product is deleted
+        return response
 
 
 @api_view(["POST"])
