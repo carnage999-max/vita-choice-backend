@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'main',
     'users',
-    'corsheaders'
+    'corsheaders',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -125,7 +126,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATIC_URL = "static/"
 
@@ -164,3 +164,26 @@ JAZZMIN_SETTINGS = {
         "Product": "fas fa-box",
     },
 }
+
+# Use S3 for all media uploads
+DEFAULT_FILE_STORAGE = "vitachoice_backend.storage_backends.MediaStorage"
+
+# AWS credentials (use env vars for safety)
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = "us-east-1"
+
+# Public URL setup
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+AWS_QUERYSTRING_AUTH = False   # disable signed URLs
+
+# Media files served directly from S3
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+
+# Optional: caching headers for performance
+AWS_S3_OBJECT_PARAMETERS = {
+    "CacheControl": "max-age=86400",
+}
+
+print(">>> USING STORAGE:", DEFAULT_FILE_STORAGE)

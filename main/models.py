@@ -2,6 +2,9 @@ import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from main.storage_backends import MediaStorage
+
+
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, db_index=True)
@@ -11,20 +14,22 @@ class Product(models.Model):
         max_digits=10, decimal_places=2, null=True, blank=True
     )
     category = models.CharField(max_length=100, db_index=True)
-    image = models.URLField(max_length=500, blank=True)
+    image = models.ImageField(
+        storage=MediaStorage(), upload_to="products/", blank=True, null=True
+    )
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=0)
     review_count = models.PositiveIntegerField(default=0)
     description = models.TextField(blank=True, null=True)
     short_description = models.TextField(blank=True, null=True)
     usage = models.TextField(blank=True, null=True)
-    
+
     key_actives = models.JSONField(default=list, blank=True)
     free_from = models.JSONField(default=list, blank=True)
     benefits = models.JSONField(default=list, blank=True)
-    
+
     serving_size = models.CharField(max_length=100, blank=True, null=True)
     servings_per_bottle = models.IntegerField(blank=True, null=True)
-    
+
     faqs = models.JSONField(default=list, blank=True)
     usage = models.TextField(blank=True, null=True)
 
@@ -40,12 +45,14 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-    
+
 class ContactMessage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     email = models.EmailField()
-    phone_number = models.CharField(_("phone number"), max_length=15, blank=True, null=True)
+    phone_number = models.CharField(
+        _("phone number"), max_length=15, blank=True, null=True
+    )
     inquiry_type = models.CharField(max_length=100, blank=True)
     subject = models.CharField(max_length=255)
     message = models.TextField()
@@ -60,7 +67,9 @@ class ContactMessage(models.Model):
 # --------------------
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey("users.User", related_name="orders", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        "users.User", related_name="orders", on_delete=models.CASCADE
+    )
     status = models.CharField(
         max_length=20,
         choices=[
