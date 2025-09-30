@@ -22,13 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-y@1btw+_mm+vfappt!(6=x1y+=$3^*_*=czh)lfc)r0n1e786q"
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 ALLOWED_HOSTS = ["vita-choice-backend.onrender.com", 'localhost']
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://vita-choice.vercel.app"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://vita-choice.vercel.app", "https://main.d17mguxv8royv0.amplifyapp.com"]
 
 
 # Application definition
@@ -219,5 +219,3 @@ MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 AWS_S3_OBJECT_PARAMETERS = {
     "CacheControl": "max-age=86400",
 }
-
-print(">>> USING STORAGE:", DEFAULT_FILE_STORAGE)
