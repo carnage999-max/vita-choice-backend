@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-y@1btw+_mm+vfappt!(6=x1y+=$3^*_*=czh)lfc)r0n1e786q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["vita-choice-backend.onrender.com"]
+ALLOWED_HOSTS = ["vita-choice-backend.onrender.com", 'localhost']
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://vita-choice.vercel.app"]
 
 

@@ -13,6 +13,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 
+PRODUCT_CACHE_KEY = "product_list_cache"
+
+
 class ProductViewset(ModelViewSet):
     queryset = Product.objects.all().order_by("-created_at")
     serializer_class = ProductSerializer
@@ -24,23 +27,35 @@ class ProductViewset(ModelViewSet):
             permission_classes = []
         return [permission() for permission in permission_classes]
 
-    @method_decorator(cache_page(60 * 60 * 24))  # Cache for 24 hours
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        # Try to get the cached response
+        cached_data = cache.get(PRODUCT_CACHE_KEY)
+        if cached_data is not None:
+            print("Cache hit: Returning cached data")
+            return Response(cached_data)
+
+        # If not in cache, generate the response
+        print("Cache miss: Generating new data")
+        response = super().list(request, *args, **kwargs)
+        cache.set(PRODUCT_CACHE_KEY, response.data, timeout=60 * 60 * 24)  # 24 hours
+        return response
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        cache.delete_pattern("vitachoice:*")  # Clear cache when new product is added
+        cache.delete(PRODUCT_CACHE_KEY)  # Clear cache when new product is added
+        print("View: Clearing cache on create")
         return response
 
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
-        cache.delete_pattern("vitachoice:*")  # Clear cache when product is updated
+        cache.delete(PRODUCT_CACHE_KEY)  # Clear cache when product is updated
+        print("View: Clearing cache on update")
         return response
 
     def destroy(self, request, *args, **kwargs):
         response = super().destroy(request, *args, **kwargs)
-        cache.delete_pattern("vitachoice:*")  # Clear cache when product is deleted
+        cache.delete(PRODUCT_CACHE_KEY)  # Clear cache when product is deleted
+        print("View: Clearing cache on delete")
         return response
 
 
