@@ -17,9 +17,19 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from django.utils import timezone
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+
+@api_view(["GET"])
+def health_check(request):
+    """Lightweight health check endpoint for cron jobs"""
+    return Response({"status": "ok", "timestamp": timezone.now()}, status=200)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/', include('main.urls')),
     path('api/users/', include('users.urls')),
+    path("health/", health_check, name="health_check"),
 ]
