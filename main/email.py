@@ -19,6 +19,6 @@ def send_contact_email(contact_message):
         subject,
         message,
         settings.DEFAULT_FROM_EMAIL,
-        ['ezekielokebule@proton.me'],
+        [settings.CONTACT_EMAIL_RECIPIENT],
         fail_silently=False,
     )
