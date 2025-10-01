@@ -6,3 +6,9 @@ env/
 db.sqlite3
 .venv/
 venv/
+.DS_Store
+staticfiles/
+media/
+*.log
+db.sqlite3
+*.sqlite3
