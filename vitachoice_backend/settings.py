@@ -28,7 +28,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = False
 
 ALLOWED_HOSTS = ["vita-choice-backend.onrender.com", 'localhost']
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://vita-choice.vercel.app", "https://main.d17mguxv8royv0.amplifyapp.com"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://vita-choice.vercel.app", "https://main.d17mguxv8royv0.amplifyapp.com", "https://thevitachoice.com", "https://www.thevitachoice.com"]
 
 
 # Application definition
