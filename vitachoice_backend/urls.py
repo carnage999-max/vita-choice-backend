@@ -20,6 +20,11 @@ from django.urls import path, include
 from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 
 @api_view(["GET"])
@@ -27,9 +32,15 @@ def health_check(request):
     """Lightweight health check endpoint for cron jobs"""
     return Response({"status": "ok", "timestamp": timezone.now()}, status=200)
 
+
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('api/', include('main.urls')),
-    path('api/users/', include('users.urls')),
+    path("api/", include("main.urls")),
+    path("api/auth/", include("users.urls")),
+    path("api/", include("ingredients.urls")),
     path("health/", health_check, name="health_check"),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]

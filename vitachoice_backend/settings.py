@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 from decouple import config
 from urllib.parse import urlparse, parse_qsl
@@ -22,13 +23,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["vita-choice-backend.onrender.com", 'localhost']
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://vita-choice.vercel.app", "https://main.d17mguxv8royv0.amplifyapp.com", "https://thevitachoice.com", "https://www.thevitachoice.com"]
+ALLOWED_HOSTS = ["vita-choice-backend.onrender.com", "localhost"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://vita-choice.vercel.app",
+    "https://main.d17mguxv8royv0.amplifyapp.com",
+    "https://thevitachoice.com",
+    "https://www.thevitachoice.com",
+]
 
 
 # Application definition
@@ -42,12 +49,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "main",
     "users",
     "corsheaders",
     "storages",
-    "ingredients"
+    "ingredients",
+    "drf_spectacular",
+    
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -96,16 +106,16 @@ tmpPostgres = urlparse(config("DATABASE_URL"))
 
 if DEBUG is False:
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': tmpPostgres.path.replace('/', ''),
-        'USER': tmpPostgres.username,
-        'PASSWORD': tmpPostgres.password,
-        'HOST': tmpPostgres.hostname,
-        'PORT': 5432,
-        'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": tmpPostgres.path.replace("/", ""),
+            "USER": tmpPostgres.username,
+            "PASSWORD": tmpPostgres.password,
+            "HOST": tmpPostgres.hostname,
+            "PORT": 5432,
+            "OPTIONS": dict(parse_qsl(tmpPostgres.query)),
+        }
     }
-}
 
 # Redis Cache Configuration
 CACHES = {
@@ -181,12 +191,6 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 CONTACT_EMAIL_RECIPIENT = config("CONTACT_EMAIL_RECIPIENT")
 
 
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
-}
-
 JAZZMIN_SETTINGS = {
     "site_title": "Vita Choice Admin",
     "site_header": "Vita Choice",
@@ -220,3 +224,43 @@ MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 AWS_S3_OBJECT_PARAMETERS = {
     "CacheControl": "max-age=86400",
 }
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  # Access token expires in 1 hour
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Refresh token expires in 7 days
+    "ROTATE_REFRESH_TOKENS": True,  # Get new refresh token when refreshing
+    "BLACKLIST_AFTER_ROTATION": True,  # Old refresh tokens are blacklisted
+    "UPDATE_LAST_LOGIN": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Vita Choice API",
+    "DESCRIPTION": "API documentation for Vita Choice",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "displayOperationId": True,
+    },
+}
+
+
+AUTH_USER_MODEL = "users.User"

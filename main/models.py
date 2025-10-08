@@ -53,9 +53,9 @@ class ContactMessage(models.Model):
     phone_number = models.CharField(
         _("phone number"), max_length=15, blank=True, null=True
     )
-    inquiry_type = models.CharField(max_length=100, blank=True)
-    subject = models.CharField(max_length=255)
-    message = models.TextField()
+    inquiry_type = models.CharField(max_length=100, blank=True, null=True)
+    subject = models.CharField(max_length=255, blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

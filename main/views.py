@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAdminUser
-from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
@@ -60,11 +60,12 @@ class ProductViewset(ModelViewSet):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def contact(request):
     name = request.data.get("name")
     email = request.data.get("email")
-    subject = request.data.get("subject")
-    message = request.data.get("message")
+    subject = request.data.get("subject", "")
+    message = request.data.get("message", "")
     phone_number = request.data.get("phone_number")
     inquiry_type = request.data.get("inquiry_type")
     contact = ContactMessage.objects.create(
