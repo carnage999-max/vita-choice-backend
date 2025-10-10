@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     "storages",
     "ingredients",
     "drf_spectacular",
-    
     "django_filters",
 ]
 
@@ -236,6 +235,9 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_ID_TYPE": "uuid",
 }
 
 REST_FRAMEWORK = {
