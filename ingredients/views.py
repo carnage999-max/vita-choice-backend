@@ -1,6 +1,7 @@
 import csv
 from django.http import HttpResponse
 from django.utils import timezone
+from django.utils.text import slugify
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,6 +16,7 @@ from .serializers import (
     ComplianceResultSerializer,
 )
 from .models import Formula, FormulaItem
+from .services.pdf_generator import FormulaSummaryGenerator, SupplementFactsGenerator
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Prefetch
 
@@ -375,18 +377,20 @@ class FormulaViewSet(viewsets.ModelViewSet):
             return Response(
                 {"error": "Formula has no ingredients. Cannot generate label."},
                 status=status.HTTP_400_BAD_REQUEST,
-            )
+        )
 
         try:
-            # TODO: Implement PDF generation
-            # generator = SupplementFactsGenerator(formula)
-            # pdf_buffer = generator.generate()
+            generator = SupplementFactsGenerator(formula)
+            pdf_buffer = generator.generate()
+            pdf_content = pdf_buffer.getvalue()
+            pdf_buffer.close()
 
-            # For now, return a placeholder response
-            return Response(
-                {"error": "PDF generation not yet implemented"},
-                status=status.HTTP_501_NOT_IMPLEMENTED,
+            filename = slugify(formula.name) or "formula"
+            response = HttpResponse(pdf_content, content_type="application/pdf")
+            response["Content-Disposition"] = (
+                f'attachment; filename="{filename}-supplement-facts.pdf"'
             )
+            return response
 
         except Exception as e:
             return Response(
@@ -412,15 +416,17 @@ class FormulaViewSet(viewsets.ModelViewSet):
             )
 
         try:
-            # TODO: Implement PDF generation
-            # generator = FormulaSummaryGenerator(formula)
-            # pdf_buffer = generator.generate()
+            generator = FormulaSummaryGenerator(formula)
+            pdf_buffer = generator.generate()
+            pdf_content = pdf_buffer.getvalue()
+            pdf_buffer.close()
 
-            # For now, return a placeholder response
-            return Response(
-                {"error": "PDF generation not yet implemented"},
-                status=status.HTTP_501_NOT_IMPLEMENTED,
+            filename = slugify(formula.name) or "formula"
+            response = HttpResponse(pdf_content, content_type="application/pdf")
+            response["Content-Disposition"] = (
+                f'attachment; filename="{filename}-summary.pdf"'
             )
+            return response
 
         except Exception as e:
             return Response(
