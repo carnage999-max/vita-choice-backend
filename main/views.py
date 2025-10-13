@@ -19,6 +19,7 @@ PRODUCT_CACHE_KEY = "product_list_cache"
 class ProductViewset(ModelViewSet):
     queryset = Product.objects.all().order_by("-created_at")
     serializer_class = ProductSerializer
+    pagination_class = None
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:

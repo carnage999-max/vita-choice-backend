@@ -28,7 +28,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["vita-choice-backend.onrender.com", "localhost"]
+ALLOWED_HOSTS = ["vita-choice-backend.onrender.com", "localhost", "vitachoice-backend.us-east-1.elasticbeanstalk.com"]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://vita-choice.vercel.app",
@@ -248,7 +248,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 20,
+    "PAGE_SIZE": 50,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
