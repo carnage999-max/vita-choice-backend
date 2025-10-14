@@ -12,9 +12,7 @@ from .serializers import (
     LoginSerializer,
     RegisterSerializer,
     UserSerializer,
-    ChangePasswordSerializer,
 )
-from .utils import blacklist_all_user_tokens
 
 
 User = get_user_model()
@@ -151,42 +149,6 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
-
-
-class ChangePasswordView(APIView):
-    """
-    Change user password
-
-    POST /api/auth/change-password/
-    Body: {
-        "old_password": "OldPass123",
-        "new_password": "NewPass456"
-    }
-    """
-
-    permission_classes = [IsAuthenticated]
-    serializer_class = ChangePasswordSerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            user = request.user
-            if not user.check_password(serializer.validated_data.get("old_password")):
-                return Response(
-                    {"error": "Old password is incorrect"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            user.set_password(serializer.data.get("new_password"))
-            user.save()
-            
-            if serializer.validated_data.get('logout_all'):
-                blacklist_all_user_tokens(user)
-
-            return Response(
-                {"message": "Password changed successfully"}, status=status.HTTP_200_OK
-            )
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
