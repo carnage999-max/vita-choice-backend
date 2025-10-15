@@ -28,7 +28,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["vita-choice-backend.onrender.com", "localhost", "vitachoice-backend.us-east-1.elasticbeanstalk.com"]
+ALLOWED_HOSTS = ["vita-choice-backend.onrender.com", "localhost", "api.thevitachoice.com", ".thevitachoice.com"]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://vita-choice.vercel.app",
