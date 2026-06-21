@@ -19,6 +19,6 @@ def send_contact_email(contact_message):
         subject,
         message,
         settings.DEFAULT_FROM_EMAIL,
-        [settings.CONTACT_EMAIL_RECIPIENT],
+        [settings.CONTACT_EMAIL_RECIPIENT, contact_message.email],
         fail_silently=False,
     )
