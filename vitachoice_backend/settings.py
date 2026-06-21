@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     "main",
     "users",
     "corsheaders",
-    "storages",
     "ingredients",
     "drf_spectacular",
     "django_filters",
@@ -116,14 +115,10 @@ if DEBUG is False:
         }
     }
 
-# Redis Cache Configuration
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": config("REDIS_URL", default="redis://127.0.0.1:6379/1"),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "vitachoice-cache",
         "KEY_PREFIX": "vitachoice",  # Prefix for all cache keys
     }
 }
@@ -178,16 +173,9 @@ WHITENOISE_COMPRESS = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = config("EMAIL_HOST")
-EMAIL_PORT = config("EMAIL_PORT", cast=int)
-EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool)
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
-# DEFAULT_FROM_EMAIL = "ezekielokebule@proton.me"
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
-
 CONTACT_EMAIL_RECIPIENT = config("CONTACT_EMAIL_RECIPIENT")
+RESEND_API_KEY = config("RESEND_API_KEY")
 
 
 JAZZMIN_SETTINGS = {
@@ -203,26 +191,8 @@ JAZZMIN_SETTINGS = {
     },
 }
 
-# Use S3 for all media uploads
-DEFAULT_FILE_STORAGE = "vitachoice_backend.storage_backends.MediaStorage"
-
-# AWS credentials (use env vars for safety)
-AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
-AWS_S3_REGION_NAME = "us-east-1"
-
-# Public URL setup
-AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
-AWS_QUERYSTRING_AUTH = False  # disable signed URLs
-
-# Media files served directly from S3
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
-
-# Optional: caching headers for performance
-AWS_S3_OBJECT_PARAMETERS = {
-    "CacheControl": "max-age=86400",
-}
+MEDIA_ROOT = Path(config("MEDIA_ROOT", default="/app/media"))
+MEDIA_URL = config("MEDIA_URL", default="/media/")
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),  # Access token expires in 1 hour
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Refresh token expires in 7 days

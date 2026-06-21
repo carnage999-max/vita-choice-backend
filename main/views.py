@@ -3,14 +3,10 @@ from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.core.cache import cache
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
 from .models import ContactMessage
 from .models import Product
 from .serializers import ProductSerializer
 from .email import send_contact_email
-from django.core.mail import send_mail
-from django.conf import settings
 
 
 PRODUCT_CACHE_KEY = "product_list_cache"

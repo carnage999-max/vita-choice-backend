@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.conf import settings
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -11,6 +12,7 @@ from unittest.mock import patch
 
 from .models import Product, ContactMessage, Order, OrderItem, Payment
 from .serializers import ProductSerializer
+from .email import send_contact_email
 
 
 class ProductModelTests(TestCase):
@@ -332,6 +334,41 @@ class ContactAPITests(APITestCase):
         url = reverse("contact")
         # This would depend on your model validation
         # The current model doesn't enforce email validation at DB level
+
+
+class ContactEmailTests(TestCase):
+    """Test outbound contact email delivery"""
+
+    @patch("main.email.requests.post")
+    def test_send_contact_email_uses_resend_api(self, mock_post):
+        contact = ContactMessage.objects.create(
+            name="John Doe",
+            email="john@example.com",
+            phone_number="+1234567890",
+            inquiry_type="product_question",
+            subject="Question about products",
+            message="I would like to know more about your supplements.",
+        )
+
+        mock_post.return_value.raise_for_status.return_value = None
+
+        send_contact_email(contact)
+
+        mock_post.assert_called_once()
+        args, kwargs = mock_post.call_args
+        self.assertEqual(args[0], "https://api.resend.com/emails")
+        self.assertEqual(
+            kwargs["headers"]["Authorization"],
+            f"Bearer {settings.RESEND_API_KEY}",
+        )
+        self.assertEqual(kwargs["headers"]["Content-Type"], "application/json")
+        self.assertEqual(kwargs["json"]["from"], settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(
+            kwargs["json"]["to"],
+            [settings.CONTACT_EMAIL_RECIPIENT, contact.email],
+        )
+        self.assertIn(contact.subject, kwargs["json"]["subject"])
+        self.assertIn(contact.message, kwargs["json"]["text"])
 
 
 class ProductSerializerTests(TestCase):

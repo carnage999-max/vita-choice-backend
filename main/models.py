@@ -2,8 +2,6 @@ import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from main.storage_backends import MediaStorage
-
 
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -14,9 +12,7 @@ class Product(models.Model):
         max_digits=10, decimal_places=2, null=True, blank=True
     )
     category = models.CharField(max_length=100, db_index=True)
-    image = models.ImageField(
-        storage=MediaStorage(), upload_to="products/", blank=True, null=True
-    )
+    image = models.ImageField(upload_to="products/", blank=True, null=True)
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=0)
     review_count = models.PositiveIntegerField(default=0)
     description = models.TextField(blank=True, null=True)

@@ -1,7 +1,6 @@
-from django.core.mail import send_mail
+import requests
 from django.conf import settings
 from .models import ContactMessage
-
 
 
 def send_contact_email(contact_message):
@@ -15,10 +14,18 @@ def send_contact_email(contact_message):
     Message:
     {contact_message.message}
     """
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [settings.CONTACT_EMAIL_RECIPIENT, contact_message.email],
-        fail_silently=False,
+    response = requests.post(
+        "https://api.resend.com/emails",
+        headers={
+            "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "from": settings.DEFAULT_FROM_EMAIL,
+            "to": [settings.CONTACT_EMAIL_RECIPIENT, contact_message.email],
+            "subject": subject,
+            "text": message,
+        },
+        timeout=30,
     )
+    response.raise_for_status()

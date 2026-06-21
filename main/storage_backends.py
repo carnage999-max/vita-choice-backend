@@ -1,6 +1,9 @@
-from storages.backends.s3boto3 import S3Boto3Storage
+from django.core.files.storage import FileSystemStorage
 
-class MediaStorage(S3Boto3Storage):
-    location = "media"
-    default_acl = None
+class MediaStorage(FileSystemStorage):
+    """
+    Compatibility shim for historical migrations that reference MediaStorage.
+    Runtime uploads use Django's default FileSystemStorage via MEDIA_ROOT/MEDIA_URL.
+    """
+
     file_overwrite = False

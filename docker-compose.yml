@@ -1,0 +1,17 @@
+services:
+  vita-choice-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vita-choice-backend
+    env_file: .env
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - /mnt/data/media/vitachoice-media:/app/media
+    restart: unless-stopped
+
+networks:
+  default:
+    name: shared-net
+    external: true
