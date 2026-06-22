@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.core.cache import cache
+import logging
 from .models import ContactMessage
 from .models import Product
 from .serializers import ProductSerializer
@@ -10,6 +11,7 @@ from .email import send_contact_email
 
 
 PRODUCT_CACHE_KEY = "product_list_cache"
+logger = logging.getLogger(__name__)
 
 
 class ProductViewset(ModelViewSet):
@@ -73,5 +75,10 @@ def contact(request):
         phone_number=phone_number,
         inquiry_type=inquiry_type,
     )
-    send_contact_email(contact_message=contact)
-    return Response({"status": "Message received"}, status=201)
+    email_status = "sent"
+    try:
+        send_contact_email(contact_message=contact)
+    except Exception:
+        email_status = "failed"
+        logger.exception("Failed to send contact email for message %s", contact.id)
+    return Response({"status": "Message received", "email_status": email_status}, status=201)

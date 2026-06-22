@@ -22,7 +22,8 @@ def send_contact_email(contact_message):
         },
         json={
             "from": settings.DEFAULT_FROM_EMAIL,
-            "to": [settings.CONTACT_EMAIL_RECIPIENT, contact_message.email],
+            "to": [settings.CONTACT_EMAIL_RECIPIENT],
+            "reply_to": contact_message.email,
             "subject": subject,
             "text": message,
         },

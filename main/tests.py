@@ -308,6 +308,20 @@ class ContactAPITests(APITestCase):
         # Verify email sending was called
         mock_send_email.assert_called_once()
 
+    @patch("main.views.send_contact_email", side_effect=Exception("resend failure"))
+    def test_contact_form_submission_survives_email_failure(self, mock_send_email):
+        """Test contact submission still succeeds if outbound email fails"""
+        url = reverse("contact")
+        response = self.client.post(url, self.contact_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["status"], "Message received")
+        self.assertEqual(response.data["email_status"], "failed")
+
+        contact = ContactMessage.objects.get(email="john@example.com")
+        self.assertEqual(contact.name, "John Doe")
+        mock_send_email.assert_called_once()
+
     def test_contact_form_missing_fields(self):
         """Test contact form with missing required fields"""
         incomplete_data = {
@@ -363,10 +377,8 @@ class ContactEmailTests(TestCase):
         )
         self.assertEqual(kwargs["headers"]["Content-Type"], "application/json")
         self.assertEqual(kwargs["json"]["from"], settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(
-            kwargs["json"]["to"],
-            [settings.CONTACT_EMAIL_RECIPIENT, contact.email],
-        )
+        self.assertEqual(kwargs["json"]["to"], [settings.CONTACT_EMAIL_RECIPIENT])
+        self.assertEqual(kwargs["json"]["reply_to"], contact.email)
         self.assertIn(contact.subject, kwargs["json"]["subject"])
         self.assertIn(contact.message, kwargs["json"]["text"])
 
