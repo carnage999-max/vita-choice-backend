@@ -28,14 +28,26 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["vita-choice-backend.onrender.com", "localhost", "api.thevitachoice.com", ".thevitachoice.com", "vitachoice-backend-dev.us-east-2.elasticbeanstalk.com", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "vita-choice-backend.onrender.com",
+    "localhost",
+    "127.0.0.1",
+    "myvitachoice.com",
+    ".myvitachoice.com",
+    "api.myvitachoice.com"
+]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://vita-choice.vercel.app",
-    "https://main.d17mguxv8royv0.amplifyapp.com",
-    "https://thevitachoice.com",
-    "https://www.thevitachoice.com",
+    "https://myvitachoice.com",
+    "https://www.myvitachoice.com",
 ]
+CSRF_TRUSTED_ORIGINS = [
+    "https://api.myvitachoice.com",
+    "https://myvitachoice.com",
+    "https://www.myvitachoice.com",
+]
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
